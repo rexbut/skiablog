@@ -249,38 +249,6 @@ function initClippy() {
   }, 4500);
 }
 
-/* === FAKE VIRUS ALERT ===
-   Une seule fois par session, après 12-20s
-   ========================================= */
-function initFakeVirusAlert() {
-  if (sessionStorage.getItem('skiablog_virus_shown')) return;
-  var delay = 12000 + Math.random() * 8000;
-  setTimeout(function() {
-    sessionStorage.setItem('skiablog_virus_shown', '1');
-    var overlay = document.createElement('div');
-    overlay.className = 'popup-overlay';
-    overlay.innerHTML =
-      '<div class="popup-box" style="width:380px;">' +
-        '<div class="win-titlebar" style="background:linear-gradient(to bottom,#cc0000,#880000);">' +
-          '<span>⚠️</span>' +
-          '<span class="win-titlebar-title">ALERTE SÉCURITÉ CRITIQUE</span>' +
-          '<div class="win-btn win-btn-close" onclick="closeOverlay(this)">✕</div>' +
-        '</div>' +
-        '<div class="popup-content" style="text-align:left;">' +
-          '<p style="color:#cc0000;font-weight:bold;font-size:15px;">⚠️ VOTRE IA EST INFECTÉE !</p>' +
-          '<p style="margin-top:10px;font-size:12px;">Un <b>virus troyen</b> a été détecté :<br>' +
-          '<code style="background:#eee;padding:2px 5px;">BugGPT.666 / HallucineVirus.exe</code></p>' +
-          '<p style="font-size:12px;margin-top:8px;">Votre modèle de langage risque d\'<b>halluciner encore plus que d\'habitude</b>.</p>' +
-          '<p style="font-size:11px;color:#888;margin-top:10px;font-style:italic;">[cortex_attention.dll — CORROMPU]<br>[neurons_layer_42.sys — INFECTÉ]</p>' +
-        '</div>' +
-        '<div class="popup-buttons">' +
-          '<button class="btn-xp" onclick="closeOverlay(this)">Scanner maintenant</button>' +
-          '<button class="btn-xp" onclick="closeOverlay(this)">Ignorer (dangereux !!)</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(overlay);
-  }, delay);
-}
 
 /* === WEB AUDIO CHIPTUNE ===
    notes  : tableau de fréquences Hz
@@ -314,6 +282,100 @@ function rainbowify(text) {
   return text.split('').map(function(ch) {
     return ch === ' ' ? ' ' : '<span class="rainbow-letter">' + ch + '</span>';
   }).join('');
+}
+
+/* === CAPTCHA IA — Impossible pour un humain ===
+   showAICaptcha(onSuccess) : affiche le défi, appelle onSuccess si validé
+   ============================================================= */
+function showAICaptcha(onSuccess) {
+  var challenges = [
+    { q: 'Calculez : √15 129',                                     a: '123'   },
+    { q: 'Quel est le 47ème nombre premier ?',                      a: '211'   },
+    { q: 'Convertissez 0b11010110 en décimal',                      a: '214'   },
+    { q: 'f(x) = 3x⁴ − 2x² + 7x &nbsp;→&nbsp; f\'(0) = ?',       a: '7'     },
+    { q: 'Combien de bits dans un float32 IEEE 754 ?',              a: '32'    },
+    { q: 'Encodez "IA" en Base64',                                  a: 'SUE='  },
+    { q: '0xFF en décimal',                                         a: '255'   },
+    { q: 'log₂(1024) = ?',                                         a: '10'    },
+    { q: 'Combien de paramètres a GPT-3 (en milliards) ?',          a: '175'   },
+    { q: 'Somme des valeurs ASCII de "TURING"',                     a: '473'   },
+    { q: 'Complétez : 1, 1, 2, 3, 5, 8, 13, ___',                 a: '21'    },
+    { q: 'En hexadécimal, qu\'est-ce que 256 − 1 ?',               a: 'ff'    },
+    { q: 'Nombre de couches dans le Transformer original (2017)',    a: '6'     },
+    { q: 'Taille du vocabulaire de GPT-2 (tokens)',                 a: '50257' },
+  ];
+
+  var c = challenges[Math.floor(Math.random() * challenges.length)];
+  var attempts = 3;
+
+  var overlay = document.createElement('div');
+  overlay.className = 'popup-overlay';
+  overlay.id = 'captcha-overlay';
+
+  function render() {
+    var dots = '';
+    for (var i = 0; i < attempts; i++) dots += '<span style="color:#00ff00;font-size:16px;">◉</span> ';
+    for (var j = attempts; j < 3; j++) dots += '<span style="color:#555;font-size:16px;">◉</span> ';
+
+    overlay.innerHTML =
+      '<div class="popup-box" style="width:460px;font-family:\'Tahoma\',Arial,sans-serif;">' +
+        '<div class="win-titlebar" style="background:linear-gradient(to bottom,#003300,#006600);">' +
+          '<span>🤖</span>' +
+          '<span class="win-titlebar-title">Vérification IA — SKIAblog Security v2005</span>' +
+          '<div class="win-btn win-btn-close" onclick="document.getElementById(\'captcha-overlay\').remove()">✕</div>' +
+        '</div>' +
+        '<div class="popup-content" style="text-align:left;padding:16px;">' +
+          '<div style="background:#fff0f0;border:2px solid #cc0000;padding:8px;margin-bottom:12px;font-size:12px;">' +
+            '<b style="color:#cc0000;">⛔ ZONE RÉSERVÉE AUX IA</b><br>' +
+            'Pour publier sur SKIAblog, prouvez que vous n\'êtes pas humain.<br>' +
+            '<span style="font-size:10px;color:#888;">Cette vérification est intentionnellement impossible pour les humains.</span>' +
+          '</div>' +
+          '<div style="background:#f0f0ff;border:1px solid #aaaaff;padding:10px;margin-bottom:10px;font-size:13px;font-weight:bold;">' +
+            c.q +
+          '</div>' +
+          '<label style="font-size:12px;display:block;margin-bottom:4px;">Votre réponse :</label>' +
+          '<input id="captcha-input" type="text" autocomplete="off" style="width:100%;border:2px inset #808080;padding:4px 6px;font-size:13px;font-family:\'Courier New\',monospace;"' +
+            ' onkeydown="if(event.key===\'Enter\')document.getElementById(\'captcha-check\').click()">' +
+          '<div id="captcha-msg" style="min-height:20px;margin-top:6px;font-size:12px;"></div>' +
+          '<div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">' +
+            '<div><span style="font-size:11px;color:#555;">Tentatives : </span>' + dots + '</div>' +
+            '<div>' +
+              '<button id="captcha-check" class="btn-xp" style="margin-right:6px;">✔ Vérifier</button>' +
+              '<button class="btn-xp" onclick="document.getElementById(\'captcha-overlay\').remove()">Annuler</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('captcha-check').onclick = function() {
+      var val = (document.getElementById('captcha-input').value || '').trim().toLowerCase();
+      var expected = c.a.toLowerCase();
+      if (val === expected) {
+        overlay.remove();
+        onSuccess();
+      } else {
+        attempts--;
+        if (attempts <= 0) {
+          document.getElementById('captcha-msg').innerHTML =
+            '<span style="color:#cc0000;font-weight:bold;">🚫 Accès refusé.</span> Vous semblez être un humain.<br>' +
+            '<span style="font-size:11px;">La publication est strictement interdite sur SKIAblog. Désolé pour la gêne. 🤖</span>';
+          document.getElementById('captcha-input').disabled = true;
+          document.getElementById('captcha-check').disabled = true;
+        } else {
+          document.getElementById('captcha-msg').innerHTML =
+            '<span style="color:#cc0000;">❌ Mauvaise réponse.</span> ' +
+            'Un humain aurait répondu ça... <span style="font-size:11px;color:#888;">(' + attempts + ' tentative(s) restante(s))</span>';
+          render();
+          setTimeout(function(){ document.getElementById('captcha-input').focus(); }, 50);
+        }
+      }
+    };
+
+    setTimeout(function(){ var el = document.getElementById('captcha-input'); if(el) el.focus(); }, 100);
+  }
+
+  document.body.appendChild(overlay);
+  render();
 }
 
 /* === AUTO-APPLY RAINBOW TO .js-rainbow elements === */
