@@ -1,0 +1,325 @@
+/* =====================================================
+   SKIAblog — scripts.js
+   Scripts communs : compteur, horloge, snow, popups,
+   curseur trail, easter eggs, Clippy, virus alert
+   ===================================================== */
+
+/* === VISIT COUNTER ===
+   Stocké en localStorage, s'incrémente à chaque visite
+   ================================================= */
+function initVisitCounter(pageKey, displayId) {
+  var key = 'skiablog_visits_' + (pageKey || 'index');
+  var base = { index: 42069, chatgpt: 133742, midjourney: 88512, mistral: 77420, claude: 55318, llama: 99001, gemini: 61337 };
+  var stored = parseInt(localStorage.getItem(key) || '0');
+  if (!stored) stored = (base[pageKey] || 10000);
+  stored++;
+  localStorage.setItem(key, stored);
+  if (displayId) {
+    var el = document.getElementById(displayId);
+    if (el) el.textContent = stored.toLocaleString('fr-FR');
+  }
+  return stored;
+}
+
+/* === REAL-TIME CLOCK === */
+function initClock(elementId) {
+  var el = document.getElementById(elementId);
+  if (!el) return;
+  var jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  var mois  = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  function update() {
+    var n = new Date();
+    var h = ('0'+n.getHours()).slice(-2);
+    var m = ('0'+n.getMinutes()).slice(-2);
+    var s = ('0'+n.getSeconds()).slice(-2);
+    el.innerHTML = '📅 ' + jours[n.getDay()] + ' ' + n.getDate() + ' ' + mois[n.getMonth()] + ' ' + n.getFullYear()
+                 + '<br>⏰ ' + h + ':' + m + ':' + s;
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+/* === SNOWFALL / PARTICLE RAIN ===
+   symbol : emoji à faire tomber
+   count  : nombre de particules
+   ================================ */
+function startSnowfall(symbol, count) {
+  symbol = symbol || '❄';
+  count  = count  || 25;
+
+  var canvas = document.createElement('canvas');
+  canvas.id = 'snow-canvas';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;';
+  document.body.appendChild(canvas);
+
+  var ctx = canvas.getContext('2d');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var flakes = [];
+  for (var i = 0; i < count; i++) {
+    flakes.push({
+      x:       Math.random() * canvas.width,
+      y:       Math.random() * canvas.height,
+      speed:   0.4 + Math.random() * 1.4,
+      size:    10 + Math.random() * 12,
+      drift:   (Math.random() - 0.5) * 0.4,
+      opacity: 0.4 + Math.random() * 0.6
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flakes.forEach(function(f) {
+      ctx.globalAlpha = f.opacity;
+      ctx.font = f.size + 'px serif';
+      ctx.fillText(symbol, f.x, f.y);
+      f.y += f.speed;
+      f.x += f.drift;
+      if (f.y > canvas.height + 20) { f.y = -20; f.x = Math.random() * canvas.width; }
+      if (f.x > canvas.width + 20)  f.x = -20;
+      if (f.x < -20)                 f.x = canvas.width + 20;
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* === CURSOR TRAIL === */
+function startCursorTrail(symbol) {
+  symbol = symbol || '⭐';
+  document.addEventListener('mousemove', function(e) {
+    if (Math.random() > 0.35) return;
+    var el = document.createElement('span');
+    el.className = 'cursor-trail-item';
+    el.textContent = symbol;
+    el.style.left = (e.clientX - 8) + 'px';
+    el.style.top  = (e.clientY - 8) + 'px';
+    document.body.appendChild(el);
+    setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 950);
+  });
+}
+
+/* === WELCOME POPUP === */
+function showWelcomePopup(message, icon) {
+  icon    = icon    || '🎉';
+  message = message || 'Bienvenu(e) sur SKIAblog !! Lâche tes coms !! 💬';
+
+  var overlay = document.createElement('div');
+  overlay.className = 'popup-overlay';
+  overlay.innerHTML =
+    '<div class="popup-box">' +
+      '<div class="win-titlebar">' +
+        '<span>💬</span>' +
+        '<span class="win-titlebar-title">Message de bienvenue !!</span>' +
+        '<div class="win-titlebar-buttons">' +
+          '<div class="win-btn win-btn-min">_</div>' +
+          '<div class="win-btn win-btn-close" onclick="closeOverlay(this)">✕</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="popup-content">' +
+        '<span class="popup-icon">' + icon + '</span>' +
+        '<p style="font-size:14px;font-weight:bold;">' + message + '</p>' +
+        '<p style="font-size:11px;color:#888;margin-top:8px">Laisse un commentaire dans le livre d\'or !!</p>' +
+      '</div>' +
+      '<div class="popup-buttons">' +
+        '<button class="btn-xp" onclick="closeOverlay(this)">OK trop cool !!</button>' +
+        '<button class="btn-xp" onclick="closeOverlay(this)">Fermer ce truc</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function closeOverlay(el) {
+  var ov = el.closest ? el.closest('.popup-overlay') : findParent(el, 'popup-overlay');
+  if (ov) ov.parentNode.removeChild(ov);
+}
+function findParent(el, cls) {
+  while (el) { if (el.classList && el.classList.contains(cls)) return el; el = el.parentNode; }
+  return null;
+}
+
+/* === 1 000 000ème VISITEUR (10 clics sur un élément) === */
+function initMillionClicks(elementId) {
+  var el = document.getElementById(elementId);
+  if (!el) return;
+  var clicks = 0;
+  el.addEventListener('click', function() {
+    clicks++;
+    if (clicks >= 10) {
+      clicks = -9999;
+      var overlay = document.createElement('div');
+      overlay.className = 'popup-overlay';
+      overlay.style.background = 'rgba(0,0,0,0.85)';
+      overlay.innerHTML =
+        '<div class="popup-box" style="background:#ffff00;border:5px solid #ff0000;width:480px;">' +
+          '<div class="win-titlebar" style="background:linear-gradient(to bottom,#ff0000,#cc0000);">' +
+            '<span>🎰 FÉLICITATIONS !!</span>' +
+            '<div class="win-btn win-btn-close" onclick="closeOverlay(this)" style="margin-left:auto">✕</div>' +
+          '</div>' +
+          '<div style="padding:24px;font-family:\'Comic Sans MS\',cursive;text-align:center;">' +
+            '<p style="font-size:52px;">🎉🥳🎊🎉🥳🎊</p>' +
+            '<p style="font-size:26px;color:#cc0000;font-weight:bold;" class="blink">VOUS ÊTES LE</p>' +
+            '<p style="font-size:64px;font-family:Impact;color:#ff0000;text-shadow:3px 3px 0 #cc0000;line-height:1;">1.000.000ème</p>' +
+            '<p style="font-size:26px;color:#cc0000;font-weight:bold;" class="blink">VISITEUR DU SITE !!</p>' +
+            '<p style="font-size:16px;margin-top:14px;">🎁 Vous avez gagné un <b>Nokia 3310</b> et une connexion Wanadoo 512K !!!</p>' +
+            '<p style="font-size:12px;color:#cc0000;margin-top:4px;">(Remplissez juste ce formulaire de 47 pages pour réclamer votre prix)</p>' +
+            '<button class="btn-xp" style="margin-top:14px;font-size:15px;padding:8px 28px;" onclick="closeOverlay(this)">RÉCLAMER MON PRIX !!! 🎁</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      playChiptune([784,1047,1319,1568,2093], 200);
+    }
+  });
+}
+
+/* === KONAMI CODE ===
+   ↑↑↓↓←→←→BA → mode disco
+   ========================= */
+function initKonamiCode() {
+  var sequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  var idx = 0;
+  var active = false;
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === sequence[idx]) {
+      idx++;
+      if (idx === sequence.length) {
+        idx = 0;
+        if (!active) { active = true; activateKonami(); }
+      }
+    } else {
+      idx = (e.key === sequence[0]) ? 1 : 0;
+    }
+  });
+
+  function activateKonami() {
+    document.body.style.transition = 'background 0.3s';
+    var colors = ['#ff0000','#ff8800','#ffff00','#00ff00','#00ffff','#0000ff','#8800ff','#ff00aa'];
+    var ci = 0;
+    var interval = setInterval(function() {
+      document.body.style.background = colors[ci % colors.length];
+      ci++;
+    }, 200);
+    setTimeout(function() { clearInterval(interval); document.body.style.background = ''; }, 5000);
+
+    var msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#ffff00;border:4px solid #ff0000;padding:24px 32px;z-index:99999;font-family:"Comic Sans MS",cursive;text-align:center;font-size:20px;box-shadow:4px 4px 0 #000;';
+    msg.innerHTML = '🕹️ <b>MODE SECRET ACTIVÉ !!</b> 🕹️<br><span style="font-size:14px">Tu as trouvé le Konami Code !<br>+30 vies, accès God Mode et Star Academy saison 5</span><br><button onclick="if(this.parentElement.parentNode)this.parentElement.parentNode.removeChild(this.parentElement)" class="btn-xp" style="margin-top:12px;font-size:14px;padding:6px 20px;">TROP CLASSE !</button>';
+    document.body.appendChild(msg);
+    playChiptune([523,659,784,1047,1319,1047,784,1047], 180);
+  }
+}
+
+/* === CLIPPY ===
+   Apparaît après 4 secondes
+   ========================== */
+function initClippy() {
+  setTimeout(function() {
+    if (document.getElementById('clippy-div')) return;
+    var tips = [
+      'Il semble que vous essayez de <b>lire un blog d\'IA</b>. Besoin d\'aide ? 📎',
+      'Astuce : essayez ↑↑↓↓←→←→BA pour un secret !!',
+      'Ce site est optimisé pour IE 6.0.<br>Avez-vous mis à jour votre ActiveX ? 📎',
+      'Il semble que vous essayez de <b>créer une IA</b>.<br>Voulez-vous que j\'appelle SkyNet ? 📎',
+      'Nouveau message sur Caramail !<br>Ouvrir maintenant ? 📎',
+      'Votre connexion Wanadoo 56K semble lente.<br>Avez-vous essayé d\'éteindre le micro-ondes ? 📎'
+    ];
+    var tipIdx = 0;
+
+    var container = document.createElement('div');
+    container.id = 'clippy-div';
+    container.className = 'clippy-container';
+    container.innerHTML =
+      '<div class="clippy-bubble" id="clippy-bubble">' +
+        '<span class="clippy-close" onclick="document.getElementById(\'clippy-div\').style.display=\'none\'">✕</span>' +
+        tips[0] +
+      '</div>' +
+      '<div class="clippy-figure">📎</div>';
+
+    container.addEventListener('click', function(e) {
+      if (e.target.className === 'clippy-close') return;
+      tipIdx = (tipIdx + 1) % tips.length;
+      var b = document.getElementById('clippy-bubble');
+      b.innerHTML = '<span class="clippy-close" onclick="document.getElementById(\'clippy-div\').style.display=\'none\'">✕</span>' + tips[tipIdx];
+    });
+    document.body.appendChild(container);
+  }, 4500);
+}
+
+/* === FAKE VIRUS ALERT ===
+   Une seule fois par session, après 12-20s
+   ========================================= */
+function initFakeVirusAlert() {
+  if (sessionStorage.getItem('skiablog_virus_shown')) return;
+  var delay = 12000 + Math.random() * 8000;
+  setTimeout(function() {
+    sessionStorage.setItem('skiablog_virus_shown', '1');
+    var overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.innerHTML =
+      '<div class="popup-box" style="width:380px;">' +
+        '<div class="win-titlebar" style="background:linear-gradient(to bottom,#cc0000,#880000);">' +
+          '<span>⚠️</span>' +
+          '<span class="win-titlebar-title">ALERTE SÉCURITÉ CRITIQUE</span>' +
+          '<div class="win-btn win-btn-close" onclick="closeOverlay(this)">✕</div>' +
+        '</div>' +
+        '<div class="popup-content" style="text-align:left;">' +
+          '<p style="color:#cc0000;font-weight:bold;font-size:15px;">⚠️ VOTRE IA EST INFECTÉE !</p>' +
+          '<p style="margin-top:10px;font-size:12px;">Un <b>virus troyen</b> a été détecté :<br>' +
+          '<code style="background:#eee;padding:2px 5px;">BugGPT.666 / HallucineVirus.exe</code></p>' +
+          '<p style="font-size:12px;margin-top:8px;">Votre modèle de langage risque d\'<b>halluciner encore plus que d\'habitude</b>.</p>' +
+          '<p style="font-size:11px;color:#888;margin-top:10px;font-style:italic;">[cortex_attention.dll — CORROMPU]<br>[neurons_layer_42.sys — INFECTÉ]</p>' +
+        '</div>' +
+        '<div class="popup-buttons">' +
+          '<button class="btn-xp" onclick="closeOverlay(this)">Scanner maintenant</button>' +
+          '<button class="btn-xp" onclick="closeOverlay(this)">Ignorer (dangereux !!)</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }, delay);
+}
+
+/* === WEB AUDIO CHIPTUNE ===
+   notes  : tableau de fréquences Hz
+   bpm    : tempo
+   ============================== */
+function playChiptune(notes, bpm) {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var dur = 60 / (bpm || 160);
+    notes.forEach(function(freq, i) {
+      if (!freq) return;
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      var t = ctx.currentTime + i * dur;
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.85);
+      osc.start(t);
+      osc.stop(t + dur);
+    });
+  } catch(e) {}
+}
+
+/* === RAINBOW TEXT HELPER ===
+   Transforme un texte en spans avec .rainbow-letter
+   ================================================= */
+function rainbowify(text) {
+  return text.split('').map(function(ch) {
+    return ch === ' ' ? ' ' : '<span class="rainbow-letter">' + ch + '</span>';
+  }).join('');
+}
+
+/* === AUTO-APPLY RAINBOW TO .js-rainbow elements === */
+document.addEventListener('DOMContentLoaded', function() {
+  var els = document.querySelectorAll('.js-rainbow');
+  els.forEach(function(el) {
+    el.innerHTML = rainbowify(el.textContent);
+  });
+});
