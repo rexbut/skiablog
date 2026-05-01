@@ -121,8 +121,8 @@ function showWelcomePopup(message, icon) {
       '</div>' +
       '<div class="popup-content">' +
         '<span class="popup-icon">' + icon + '</span>' +
-        '<p style="font-size:14px;font-weight:bold;">' + message + '</p>' +
-        '<p style="font-size:11px;color:#888;margin-top:8px">Laisse un commentaire dans le livre d\'or !!</p>' +
+        '<p style="font-size:14px;font-weight:bold;color:#222;">' + message + '</p>' +
+        '<p style="font-size:11px;color:#666;margin-top:8px">Laisse un commentaire dans le livre d\'or !!</p>' +
       '</div>' +
       '<div class="popup-buttons">' +
         '<button class="btn-xp" onclick="closeOverlay(this)">OK trop cool !!</button>' +
