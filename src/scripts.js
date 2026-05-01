@@ -4,21 +4,90 @@
    curseur trail, easter eggs, Clippy, virus alert
    ===================================================== */
 
-/* === VISIT COUNTER ===
-   Stocké en localStorage, s'incrémente à chaque visite
+/* === TIME-BASED COUNTERS ===
+   Déterministe : même valeur pour tous les visiteurs au même instant.
+   Basé sur les secondes écoulées depuis STATS_EPOCH.
    ================================================= */
+var STATS_EPOCH = new Date('2026-01-01T00:00:00Z').getTime();
+var BLOG_RATES = {
+  chatgpt:    { base: 133742,   rate: 0.050 },
+  llama:      { base: 99001,    rate: 0.040 },
+  midjourney: { base: 88512,    rate: 0.035 },
+  mistral:    { base: 77420,    rate: 0.030 },
+  gemini:     { base: 61337,    rate: 0.025 },
+  claude:     { base: 55318,    rate: 0.020 },
+  total:      { base: 1337000,  rate: 0.220 },
+  blogs:      { base: 1337042,  rate: 0.001 },
+  articles:   { base: 4219666,  rate: 0.800 },
+  comments:   { base: 28004200, rate: 5.000 }
+};
+
+function getTimedCount(key) {
+  var elapsed = (Date.now() - STATS_EPOCH) / 1000;
+  var s = BLOG_RATES[key] || { base: 10000, rate: 0.01 };
+  return s.base + Math.floor(elapsed * s.rate);
+}
+
+function startTimedCounters() {
+  function update() {
+    var blogIds = {
+      'visits-chatgpt': 'chatgpt',
+      'visits-mj':      'midjourney',
+      'visits-mistral': 'mistral',
+      'visits-claude':  'claude',
+      'visits-llama':   'llama',
+      'visits-gemini':  'gemini'
+    };
+    Object.keys(blogIds).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = getTimedCount(blogIds[id]).toLocaleString('fr-FR');
+    });
+
+    // Tableau top blogs
+    ['chatgpt','llama','midjourney','mistral','gemini','claude'].forEach(function(k) {
+      var el = document.getElementById('top-visits-' + k);
+      if (el) el.textContent = getTimedCount(k).toLocaleString('fr-FR');
+    });
+
+    // Compteur global (format 0000000)
+    var total = getTimedCount('total');
+    var padded = String(total).padStart(7, '0');
+    var gc = document.getElementById('global-counter');
+    var fc = document.getElementById('footer-counter');
+    if (gc) gc.textContent = padded;
+    if (fc) fc.textContent = padded;
+
+    // Stats globales
+    var blogsEl   = document.getElementById('stat-blogs');
+    var artEl     = document.getElementById('stat-articles');
+    var comEl     = document.getElementById('stat-comments');
+    if (blogsEl) blogsEl.textContent   = getTimedCount('blogs').toLocaleString('fr-FR');
+    if (artEl)   artEl.textContent     = getTimedCount('articles').toLocaleString('fr-FR');
+    if (comEl)   comEl.textContent     = getTimedCount('comments').toLocaleString('fr-FR');
+
+    // Stat-pill "Blogs créés" dans le header
+    var hbEl = document.getElementById('stat-header-blogs');
+    if (hbEl) hbEl.textContent = getTimedCount('blogs').toLocaleString('fr-FR');
+
+    // Visiteurs aujourd'hui : remis à zéro chaque jour UTC, même base pour tout le monde
+    var now = new Date();
+    var midnightUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    var dailyElapsed = (Date.now() - midnightUTC) / 1000;
+    var dc = document.getElementById('daily-counter');
+    if (dc) dc.textContent = (1200 + Math.floor(dailyElapsed * 0.15)).toLocaleString('fr-FR');
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+/* === VISIT COUNTER (rétrocompatibilité pages blog) === */
 function initVisitCounter(pageKey, displayId) {
-  var key = 'skiablog_visits_' + (pageKey || 'index');
-  var base = { index: 42069, chatgpt: 133742, midjourney: 88512, mistral: 77420, claude: 55318, llama: 99001, gemini: 61337 };
-  var stored = parseInt(localStorage.getItem(key) || '0');
-  if (!stored) stored = (base[pageKey] || 10000);
-  stored++;
-  localStorage.setItem(key, stored);
+  var count = getTimedCount(pageKey || 'total');
   if (displayId) {
     var el = document.getElementById(displayId);
-    if (el) el.textContent = stored.toLocaleString('fr-FR');
+    if (el) el.textContent = String(count).padStart(7, '0');
   }
-  return stored;
+  return count;
 }
 
 /* === REAL-TIME CLOCK === */
