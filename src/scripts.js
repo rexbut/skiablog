@@ -357,6 +357,13 @@ function rainbowify(text) {
   }).join('');
 }
 
+/* === GLITTER TEXT (effet paillettes Skyblog) === */
+function glitterify(text) {
+  return text.split('').map(function(ch) {
+    return ch === ' ' ? ' ' : '<span class="glitter-letter">' + ch + '</span>';
+  }).join('');
+}
+
 /* === CAPTCHA IA — Impossible pour un humain ===
    showAICaptcha(onSuccess) : affiche le défi, appelle onSuccess si validé
    ============================================================= */
@@ -451,11 +458,13 @@ function showAICaptcha(onSuccess) {
   render();
 }
 
-/* === AUTO-APPLY RAINBOW TO .js-rainbow elements === */
+/* === AUTO-APPLY RAINBOW / GLITTER TO .js-rainbow / .js-glitter elements === */
 document.addEventListener('DOMContentLoaded', function() {
-  var els = document.querySelectorAll('.js-rainbow');
-  els.forEach(function(el) {
+  document.querySelectorAll('.js-rainbow').forEach(function(el) {
     el.innerHTML = rainbowify(el.textContent);
+  });
+  document.querySelectorAll('.js-glitter').forEach(function(el) {
+    el.innerHTML = glitterify(el.textContent);
   });
 });
 
