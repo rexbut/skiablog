@@ -812,3 +812,70 @@ body.cursor-gemini   { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.
 ::-webkit-scrollbar-track { background: #d4d0c8; }
 ::-webkit-scrollbar-thumb { background: #c0bdb5; border: 1px solid; border-color: #fff #808080 #808080 #fff; }
 ::-webkit-scrollbar-button { background: #d4d0c8; border: 1px solid; border-color: #fff #808080 #808080 #fff; height: 16px; }
+
+/* === LIGHTBOX AVATAR — STYLE WINDOWS XP === */
+.lightbox-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  z-index: 99999; display: flex; align-items: center; justify-content: center;
+  animation: lb-fade-in 0.1s ease;
+}
+@keyframes lb-fade-in { from { opacity:0 } to { opacity:1 } }
+
+.lightbox-win {
+  background: #d4d0c8;
+  border: 2px solid;
+  border-color: #fff #808080 #808080 #fff;
+  box-shadow: 2px 2px 0 #000, inset 1px 1px 0 #fff;
+  min-width: 320px;
+  animation: lb-scale-in 0.12s ease;
+  user-select: none;
+}
+@keyframes lb-scale-in { from { transform:scale(0.92) } to { transform:scale(1) } }
+
+.lightbox-titlebar {
+  background: var(--xp-titlebar);
+  padding: 4px 6px;
+  display: flex; align-items: center; gap: 6px;
+  cursor: move;
+}
+.lightbox-titlebar-icon { font-size: 14px; }
+.lightbox-titlebar-title {
+  flex: 1; color: #fff; font-family: 'Tahoma', Arial, sans-serif;
+  font-size: 12px; font-weight: bold; text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lightbox-titlebar-btns { display: flex; gap: 2px; }
+.lightbox-titlebar-btns .win-btn {
+  width: 18px; height: 16px; font-size: 10px; font-weight: bold; line-height: 14px;
+  font-family: 'Marlett', 'Wingdings', Arial, sans-serif;
+}
+
+.lightbox-menubar {
+  background: #d4d0c8; border-bottom: 1px solid #808080;
+  padding: 2px 6px; font-family: 'Tahoma', Arial, sans-serif; font-size: 11px;
+  display: flex; gap: 6px;
+}
+.lightbox-menubar span {
+  padding: 1px 5px; cursor: default;
+}
+.lightbox-menubar span:hover { background: #0a246a; color: #fff; }
+
+.lightbox-body {
+  padding: 8px; background: #000; display: flex;
+  align-items: center; justify-content: center;
+}
+.lightbox-body img {
+  max-width: 480px; max-height: 480px; display: block;
+  border: 2px inset #808080;
+}
+
+.lightbox-statusbar {
+  background: #d4d0c8; border-top: 1px solid #808080;
+  padding: 2px 8px; font-family: 'Tahoma', Arial, sans-serif; font-size: 10px;
+  color: #333; display: flex; gap: 10px;
+}
+.lightbox-statusbar-pane {
+  border: 1px inset #808080; padding: 1px 6px; flex: 1;
+}
+
+.avatar-zoomable { cursor: zoom-in; }

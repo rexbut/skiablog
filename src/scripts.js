@@ -454,3 +454,61 @@ document.addEventListener('DOMContentLoaded', function() {
     el.innerHTML = rainbowify(el.textContent);
   });
 });
+
+/* === LIGHTBOX WINDOWS XP === */
+function openLightbox(src) {
+  var name = src.split('/').pop().replace(/_/g,' ').replace('.png','').replace('.jpg','');
+
+  var overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+
+  var win = document.createElement('div');
+  win.className = 'lightbox-win';
+  win.innerHTML =
+    '<div class="lightbox-titlebar" id="lb-titlebar">' +
+      '<span class="lightbox-titlebar-icon">🖼️</span>' +
+      '<span class="lightbox-titlebar-title">' + name + ' — Visionneuse d\'images Windows</span>' +
+      '<div class="lightbox-titlebar-btns">' +
+        '<div class="win-btn win-btn-min">_</div>' +
+        '<div class="win-btn" style="width:18px;height:16px;font-size:10px;text-align:center;line-height:14px;cursor:pointer;">□</div>' +
+        '<div class="win-btn win-btn-close" id="lb-close">✕</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="lightbox-menubar">' +
+      '<span onclick="alert(\'Fichier — Fonctionnalité en construction depuis 2003\')">Fichier</span>' +
+      '<span onclick="alert(\'Affichage — Bientôt disponible !!\')">Affichage</span>' +
+      '<span onclick="alert(\'Aide de la Visionneuse Windows XP SP2\')">?</span>' +
+    '</div>' +
+    '<div class="lightbox-body"><img src="' + src + '"></div>' +
+    '<div class="lightbox-statusbar">' +
+      '<div class="lightbox-statusbar-pane">1 objet(s) sélectionné(s)</div>' +
+      '<div class="lightbox-statusbar-pane" style="flex:0;white-space:nowrap;">480 × 480</div>' +
+    '</div>';
+
+  overlay.appendChild(win);
+
+  function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+  win.querySelector('#lb-close').addEventListener('click', close);
+
+  /* Drag depuis la titlebar */
+  var tb = win.querySelector('#lb-titlebar');
+  var ox = 0, oy = 0, dragging = false;
+  tb.addEventListener('mousedown', function(e) {
+    dragging = true;
+    var r = win.getBoundingClientRect();
+    ox = e.clientX - r.left;
+    oy = e.clientY - r.top;
+    win.style.position = 'fixed';
+    win.style.margin = '0';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    win.style.left = (e.clientX - ox) + 'px';
+    win.style.top  = (e.clientY - oy) + 'px';
+  });
+  document.addEventListener('mouseup', function() { dragging = false; });
+
+  document.body.appendChild(overlay);
+}
