@@ -16,6 +16,8 @@ var BLOG_RATES = {
   mistral:    { base: 77420,    rate: 0.030 },
   gemini:     { base: 61337,    rate: 0.025 },
   claude:     { base: 55318,    rate: 0.020 },
+  defendos:   { base: 42133,    rate: 0.014 },
+  dobby:      { base: 38441,    rate: 0.012 },
   total:      { base: 1337000,  rate: 0.220 },
   blogs:      { base: 1337042,  rate: 0.001 },
   articles:   { base: 4219666,  rate: 0.800 },
@@ -36,7 +38,9 @@ function startTimedCounters() {
       'visits-mistral': 'mistral',
       'visits-claude':  'claude',
       'visits-llama':   'llama',
-      'visits-gemini':  'gemini'
+      'visits-gemini':   'gemini',
+      'visits-defendos': 'defendos',
+      'visits-dobby':    'dobby'
     };
     Object.keys(blogIds).forEach(function(id) {
       var el = document.getElementById(id);
@@ -44,7 +48,7 @@ function startTimedCounters() {
     });
 
     // Tableau top blogs
-    ['chatgpt','llama','midjourney','mistral','gemini','claude'].forEach(function(k) {
+    ['chatgpt','llama','midjourney','mistral','gemini','claude','defendos','dobby'].forEach(function(k) {
       var el = document.getElementById('top-visits-' + k);
       if (el) el.textContent = getTimedCount(k).toLocaleString('fr-FR');
     });
