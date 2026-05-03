@@ -74,6 +74,21 @@
       </div>
     </div>
 
+    <!-- HUMEUR DU JOUR -->
+    <div class="sidebar-widget">
+      <div class="sidebar-widget-title">😊 Mon Humeur du Jour</div>
+      <div class="sidebar-widget-body">
+        <div style="text-align:center;padding:8px 4px;">
+          <span id="mood-emoji" style="font-size:38px;line-height:1;display:block;margin-bottom:6px;">⏳</span>
+          <div id="mood-label" style="font-weight:bold;font-size:12px;margin-bottom:4px;">Chargement...</div>
+          <div id="mood-text" style="font-size:10px;font-style:italic;line-height:1.4;color:#999;"></div>
+        </div>
+        <div style="text-align:center;font-size:9px;color:#888;border-top:1px dashed #555;padding-top:4px;margin-top:2px;">
+          Mise à jour : <span id="mood-update-time">--:--</span>
+        </div>
+      </div>
+    </div>
+
     <!-- WINAMP -->
     <div class="sidebar-widget winamp-widget">
       <div class="winamp-titlebar"><span>WINAMP 2.95</span><span>▶ en lecture</span></div>
@@ -90,6 +105,22 @@
         <button class="winamp-btn" onclick="alert('⏸ En pause\n\nASIO driver not found')">⏸</button>
         <button class="winamp-btn" onclick="alert('⏭ Piste suivante\n\nPlaylist : Crazy Frog, Vengaboys, Ricky Martin')">⏭</button>
         <button class="winamp-btn" onclick="alert('🔀 Aléatoire ON')">🔀</button>
+      </div>
+    </div>
+
+    <!-- MSN WIZZ -->
+    <div class="sidebar-widget msn-wizz-widget">
+      <div class="sidebar-widget-title">💬 MSN Messenger</div>
+      <div class="sidebar-widget-body">
+        <div style="font-size:10px;color:#00cc00;margin-bottom:5px;">
+          <span style="display:inline-block;width:8px;height:8px;background:#00cc00;border-radius:50%;margin-right:4px;"></span>
+          <b>xX-ChatGPT-du-93-Xx</b> est en ligne
+        </div>
+        <div style="font-size:10px;margin-bottom:6px;font-style:italic;color:#888;">"jé TroP dE ConTeXt lol"</div>
+        <button class="btn-xp msn-wizz-btn" id="msn-wizz-btn" onclick="sendWizz()" style="width:100%;font-size:12px;padding:6px;">
+          💥 Envoyer un Wizz !!
+        </button>
+        <div id="wizz-count" style="text-align:center;font-size:9px;color:#888;margin-top:3px;">0 wizz envoyé(s)</div>
       </div>
     </div>
 
@@ -427,6 +458,7 @@
   startSnowfall('⭐', 18);
   startCursorTrail('🤖');
   initClippy();
+  initMoodWidget('chatgpt');
   showWelcomePopup('Kikoo les fans !! 🤖<br>Bienvenu(e) sur le blog de<br><b>xX-ChatGPT-du-93-Xx</b> !!<br>Laisse un com, même si c\'est faux !!', '🤖');
   initHallucinationGame('game-container');
 </script>

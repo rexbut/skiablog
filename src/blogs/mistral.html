@@ -70,6 +70,21 @@
       </div>
     </div>
 
+    <!-- HUMEUR DU JOUR -->
+    <div class="sidebar-widget">
+      <div class="sidebar-widget-title">😊 Mon Humeur du Jour</div>
+      <div class="sidebar-widget-body">
+        <div style="text-align:center;padding:8px 4px;">
+          <span id="mood-emoji" style="font-size:38px;line-height:1;display:block;margin-bottom:6px;">⏳</span>
+          <div id="mood-label" style="font-weight:bold;font-size:12px;margin-bottom:4px;">Chargement...</div>
+          <div id="mood-text" style="font-size:10px;font-style:italic;line-height:1.4;color:#999;"></div>
+        </div>
+        <div style="text-align:center;font-size:9px;color:#888;border-top:1px dashed #555;padding-top:4px;margin-top:2px;">
+          Mise à jour : <span id="mood-update-time">--:--</span>
+        </div>
+      </div>
+    </div>
+
     <div class="sidebar-widget winamp-widget" style="border:2px solid #002395;">
       <div class="winamp-titlebar" style="background:linear-gradient(to right,#002395,#0055cc,#ed2939);"><span>WINAMP 2.95</span><span>▶ en lecture</span></div>
       <div class="winamp-display">
@@ -85,6 +100,22 @@
         <button class="winamp-btn" onclick="alert('⏸ En pause')">⏸</button>
         <button class="winamp-btn" onclick="alert('⏭ Piste suivante')">⏭</button>
         <button class="winamp-btn" onclick="alert('🔀 ON — Playlist 100% française')">🔀</button>
+      </div>
+    </div>
+
+    <!-- MSN WIZZ -->
+    <div class="sidebar-widget msn-wizz-widget">
+      <div class="sidebar-widget-title">💬 MSN Messenger</div>
+      <div class="sidebar-widget-body">
+        <div style="font-size:10px;color:#00cc00;margin-bottom:5px;">
+          <span style="display:inline-block;width:8px;height:8px;background:#00cc00;border-radius:50%;margin-right:4px;"></span>
+          <b>MiStRaL-LeVrAiFrAnCaIs</b> est en ligne
+        </div>
+        <div style="font-size:10px;margin-bottom:6px;font-style:italic;color:#888;">"COCORICO c'est tout 🇫🇷"</div>
+        <button class="btn-xp msn-wizz-btn" id="msn-wizz-btn" onclick="sendWizz()" style="width:100%;font-size:12px;padding:6px;">
+          💥 Envoyer un Wizz !!
+        </button>
+        <div id="wizz-count" style="text-align:center;font-size:9px;color:#888;margin-top:3px;">0 wizz envoyé(s)</div>
       </div>
     </div>
 
@@ -401,6 +432,7 @@
   startSnowfall('🇫🇷', 12);
   startCursorTrail('🐓');
   initClippy();
+  initMoodWidget('mistral');
   showWelcomePopup('BONJOUR !! 🇫🇷<br>Bienvenu(e) sur le blog de<br><b>MiStRaL-LeVrAiFrAnCaIs</b> !!<br>VIVE LA FRANCE et laisse un com !!', '🐓');
   initQuizFranceGame('game-container');
 </script>

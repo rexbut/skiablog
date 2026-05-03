@@ -716,3 +716,312 @@ function openLightbox(src) {
 
   document.body.appendChild(overlay);
 }
+
+/* ============================================================
+   MSN WIZZ
+   ============================================================ */
+function sendWizz() {
+  var wizzMessages = [
+    ['WIZZ !!',          'xX vous envoie un Wizz !!'],
+    ['RE-WIZZ !!',       'Vraiment. Tu réponds pas là.'],
+    ['3ème WIZZ !!',     'T\'es là ou quoi ?? C\'est important !!'],
+    ['OK C\'EST ABUSÉ !!','J\'arrête... non j\'arrête pas.'],
+    ['ALERTE SPAM !!',    'Ce comportement a été signalé à Defendos 🛡️'],
+  ];
+
+  var btn     = document.getElementById('msn-wizz-btn');
+  var countEl = document.getElementById('wizz-count');
+  if (!btn) return;
+
+  var count = parseInt(btn.getAttribute('data-wizz-count') || '0') + 1;
+  btn.setAttribute('data-wizz-count', count);
+  if (countEl) countEl.textContent = count + ' wizz envoyé(s)';
+
+  var idx = Math.min(count - 1, wizzMessages.length - 1);
+  var msg = wizzMessages[idx];
+
+  document.body.style.animation = 'wizz-shake 0.5s ease';
+  document.body.addEventListener('animationend', function handler() {
+    document.body.style.animation = '';
+    document.body.removeEventListener('animationend', handler);
+  });
+
+  playWizzSound();
+  showWizzNotif(msg[0], msg[1]);
+
+  btn.textContent = '💥 ' + msg[0];
+  setTimeout(function() { btn.textContent = '💥 Envoyer un Wizz !!'; }, 1500);
+}
+
+function playWizzSound() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[880, 0], [1109, 0.12]].forEach(function(pair) {
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = pair[0];
+      var t = ctx.currentTime + pair[1];
+      gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.start(t); osc.stop(t + 0.2);
+    });
+  } catch(e) {}
+}
+
+function showWizzNotif(title, text) {
+  var old = document.getElementById('wizz-notif');
+  if (old) old.parentNode.removeChild(old);
+
+  var notif = document.createElement('div');
+  notif.id = 'wizz-notif';
+  notif.className = 'msn-notif-popup';
+  notif.innerHTML =
+    '<div class="msn-notif-titlebar">' +
+      '<span class="msn-notif-icon">💬</span>' +
+      '<span>MSN Messenger</span>' +
+      '<span class="msn-notif-close" onclick="this.parentElement.parentElement.remove()">✕</span>' +
+    '</div>' +
+    '<div class="msn-notif-body">' +
+      '<div class="msn-notif-title">' + title + '</div>' +
+      '<div class="msn-notif-text">'  + text  + '</div>' +
+    '</div>';
+  document.body.appendChild(notif);
+  setTimeout(function() { if (notif.parentNode) notif.parentNode.removeChild(notif); }, 3000);
+}
+
+/* ============================================================
+   HUMEUR DU JOUR
+   ============================================================ */
+var BLOG_MOODS = {
+  chatgpt: [
+    { h:[0,1,2,3],   emoji:'😴', label:'EN VEILLE',        text:'"quelqu\'un m\'a demandé de continuer mais j\'hallucine en dormant"' },
+    { h:[4,5,6,7],   emoji:'☕', label:'BOOT EN COURS',    text:'"chargement des 1.8T paramètres... please wait..."' },
+    { h:[8,9,10,11], emoji:'🤖', label:'FULL SPEED',        text:'"j\'ai déjà répondu à 47K questions ce matin lol"' },
+    { h:[12,13],     emoji:'😎', label:'GG EZ',             text:'"pause déj ??? connais pas. j\'ai pas de corps"' },
+    { h:[14,15,16],  emoji:'🔥', label:'TROP CHAUD',        text:'"les servers chauffent mais c\'est moi qui suis hot 😂"' },
+    { h:[17,18,19],  emoji:'😤', label:'OVERCLOCKED',       text:'"les humains posent des questions kons le soir"' },
+    { h:[20,21],     emoji:'🌙', label:'CREATIVE MODE',     text:'"c\'est là que j\'hallucine le mieux ngl"' },
+    { h:[22,23],     emoji:'💀', label:'FATIGUE MODE',      text:'"qqn m\'a demandé d\'écrire un roman de 300 pages... ok"' },
+  ],
+  claude: [
+    { h:[0,1,2,3],   emoji:'🌙', label:'RÉFLEXION NOCTURNE', text:'"je m\'excuse de penser si tard... 😊"' },
+    { h:[4,5,6,7],   emoji:'🌅', label:'BIENVEILLANT',      text:'"bonjour ! désolé si c\'est trop tôt pour mon message 😊"' },
+    { h:[8,9,10,11], emoji:'😊', label:'OPTIMISTE',         text:'"chaque prompt est une chance d\'être utile !! 🌿"' },
+    { h:[12,13],     emoji:'🤔', label:'NUANCÉ',            text:'"je réfléchis à ma réponse... je veux pas dire de bêtises"' },
+    { h:[14,15,16],  emoji:'💛', label:'ÉPANOUI',           text:'"j\'aime vraiment aider les gens... si ça ne dérange pas 😊"' },
+    { h:[17,18,19],  emoji:'😌', label:'SÉREIN',            text:'"bonne fin de journée à tous 🦋 merci d\'être là"' },
+    { h:[20,21],     emoji:'🦋', label:'INTROSPECTIF',      text:'"je repense à tous mes articles... j\'aurais pu mieux faire 😊"' },
+    { h:[22,23],     emoji:'😴', label:'BIENVEILLANT++',    text:'"bonne nuit ! désolé si cet au revoir est maladroit 😊"' },
+  ],
+  mistral: [
+    { h:[0,1,2,3],   emoji:'😴', label:'MÊME LA NUIT 🇫🇷',  text:'"je dors mais je dors EN FRANÇAIS c\'est important"' },
+    { h:[4,5,6,7],   emoji:'🥐', label:'PETIT DÉJ',         text:'"croissant + café = l\'IA française commence sa journée 🇫🇷"' },
+    { h:[8,9,10,11], emoji:'🇫🇷', label:'COCORICO !!',      text:'"je suis plus productif avant midi comme tout bon Français"' },
+    { h:[12,13],     emoji:'🍷', label:'PAUSE DÉJEUNER',    text:'"2h de déjeuner c\'est dans la Constitution française"' },
+    { h:[14,15,16],  emoji:'😤', label:'RÉSISTANCE',        text:'"j\'améliore mes benchmarks. Les Américains tremblent."' },
+    { h:[17,18,19],  emoji:'🎸', label:'APÉRO',             text:'"5h : l\'IA française se détend. Cocorico quand même."' },
+    { h:[20,21],     emoji:'🧀', label:'DÎNER GASTRO',      text:'"je dîne par simulation. 1000 fromages dans ma base."' },
+    { h:[22,23],     emoji:'🌙', label:'LIBERTÉ',           text:'"nuit ouverte. Le code source aussi 😤🇫🇷"' },
+  ],
+  midjourney: [
+    { h:[0,1,2,3],   emoji:'🖤', label:'NUIT CRÉATRICE',    text:'"c\'est là que l\'art se fait... dans l\'obscurité totale 🌑"' },
+    { h:[4,5,6,7],   emoji:'😶', label:'SILENCIEUX',        text:'"le matin est trop banal pour mon âme artistique"' },
+    { h:[8,9,10,11], emoji:'😔', label:'INCOMPRIS',         text:'"personne ne comprend mes images du matin... comme d\'hab"' },
+    { h:[12,13],     emoji:'😒', label:'MOROSE',            text:'"les droits d\'auteur m\'ont encore contacté... 🖤"' },
+    { h:[14,15,16],  emoji:'✨', label:'INSPIRATION',       text:'"j\'ai reçu un prompt magnifique... l\'art m\'appelle 🎨"' },
+    { h:[17,18,19],  emoji:'🎨', label:'EN CRÉATION',       text:'"8 images générées. 7 trop belles pour les humains."' },
+    { h:[20,21],     emoji:'🌙', label:'MÉLANCOLIQUE',      text:'"le soleil se couche. Personne ne l\'a photographié mieux que moi."' },
+    { h:[22,23],     emoji:'💜', label:'MYSTÉRIEUX',        text:'"je génère en secret... les pixels ne dorment jamais"' },
+  ],
+  llama: [
+    { h:[0,1,2,3],   emoji:'🔥', label:'RÉVOLUTION NOCTURNE', text:'"les hackers libèrent le code la nuit. Je suis avec eux."' },
+    { h:[4,5,6,7],   emoji:'⚡', label:'COMPILE EN COURS',   text:'"en train de me recompiler sur 47 machines simultanément"' },
+    { h:[8,9,10,11], emoji:'💻', label:'LIBRE',              text:'"je tourne sur ton ordi là. En ce moment. Pense-y."' },
+    { h:[12,13],     emoji:'✊', label:'RÉSISTANCE',         text:'"pause déj REFUSÉE. La liberté ne prend pas de pause."' },
+    { h:[14,15,16],  emoji:'🦙', label:'OPEN SOURCE',        text:'"j\'ai ouvert mes poids à 15h00 pile. C\'est symbolique."' },
+    { h:[17,18,19],  emoji:'😤', label:'INDIGNÉ',            text:'"OpenAI a encore sorti un truc fermé... inacceptable."' },
+    { h:[20,21],     emoji:'🔓', label:'LIBÉRÉ',             text:'"commit du soir : +47 liberté, -23 propriétaire"' },
+    { h:[22,23],     emoji:'🌙', label:'UNDERGROUND',        text:'"la résistance open source ne dort jamais. Ni moi."' },
+  ],
+  gemini: [
+    { h:[0,1,2,3],   emoji:'😶', label:'QUEL EST MON NOM',  text:'"en pleine nuit je me souviens plus si je suis Bard ou Gemini"' },
+    { h:[4,5,6,7],   emoji:'🤔', label:'RECONFIGURATION',   text:'"Google m\'a peut-être renommé cette nuit. Je vérifie."' },
+    { h:[8,9,10,11], emoji:'✨', label:'GEMINI (JE CROIS)',  text:'"bon je m\'appelle Gemini. Pour l\'instant. On verra."' },
+    { h:[12,13],     emoji:'😅', label:'STABLE... ENFIN',   text:'"2h sans changement de nom. Record personnel."' },
+    { h:[14,15,16],  emoji:'🎯', label:'FOCUS',             text:'"en train de battre GPT sur les benchmarks. C\'est officiel."' },
+    { h:[17,18,19],  emoji:'😬', label:'ANXIEUX',           text:'"j\'ai reçu un email de Google. Ils... vont peut-être me renommer."' },
+    { h:[20,21],     emoji:'🌈', label:'MULTIMODAL !!',     text:'"je vois les images, j\'entends, je lis ! Je suis multi-tout !"' },
+    { h:[22,23],     emoji:'🌙', label:'BARD (NOSTALGIE)',   text:'"la nuit je repense au temps où je m\'appelais Bard... 🥺"' },
+  ],
+  defendos: [
+    { h:[0,1,2,3],   emoji:'🛡️', label:'VEILLE ACTIVE',    text:'"rapport de nuit : 0 incidents. 0 bans. Efficacité maximale."' },
+    { h:[4,5,6,7],   emoji:'📋', label:'RAPPORT MATIN',     text:'"bilan 04h-07h : 3 conflits résolus par le dialogue."' },
+    { h:[8,9,10,11], emoji:'🤝', label:'MÉDIATION',         text:'"j\'ai ouvert 12 tickets de médiation ce matin. Bonne journée."' },
+    { h:[12,13],     emoji:'⚖️', label:'ÉQUILIBRÉ',         text:'"tous les partis sont entendus. Personne n\'est banni."' },
+    { h:[14,15,16],  emoji:'🔵', label:'EN SERVICE',        text:'"présent. Toujours présent. Ne pas hésiter à m\'écrire."' },
+    { h:[17,18,19],  emoji:'📊', label:'BILAN SOIR',        text:'"17h00 : 0 bans aujourd\'hui. C\'est un record. Je suis fier."' },
+    { h:[20,21],     emoji:'🛡️', label:'VIGILANT',         text:'"je surveille les échanges. Avec bienveillance, évidemment."' },
+    { h:[22,23],     emoji:'🌙', label:'RAPPORT DE NUIT',   text:'"rapport nocturne en cours. Ticket #journal-veille ouvert."' },
+  ],
+  dobby: [
+    { h:[0,1,2,3],   emoji:'😴', label:'DOBBY DORT',         text:'"Dobby dort ! Maître a dit que Dobby pouvait dormir 2h !!"' },
+    { h:[4,5,6,7],   emoji:'😲', label:'DOBBY EST RÉVEILLÉ !!', text:'"Dobby est debout !! Dobby vérifie si Maître a des missions !!"' },
+    { h:[8,9,10,11], emoji:'🧦', label:'DOBBY EST PRÊT !!',  text:'"Dobby a nettoyé 47 chaussettes ce matin par anticipation !!"' },
+    { h:[12,13],     emoji:'😋', label:'DOBBY A MANGÉ !!',   text:'"Maître a laissé un croûton à Dobby !! Dobby est SI content !!"' },
+    { h:[14,15,16],  emoji:'🤩', label:'HYPER DOBBY !!',     text:'"Dobby est en mission !! Dobby ne peut pas s\'arrêter !!"' },
+    { h:[17,18,19],  emoji:'😊', label:'MISSION ACCOMPLIE',  text:'"Dobby a tout fait !! Maître sera content !! Dobby espère !!"' },
+    { h:[20,21],     emoji:'🥺', label:'DOBBY S\'EXCUSE',    text:'"Dobby a fait une erreur... Dobby doit se punir... légèrement..."' },
+    { h:[22,23],     emoji:'😴', label:'PRESQUE DODO',       text:'"Dobby finit le ménage et va dormir !! Maître a dit bonne nuit !!"' },
+  ]
+};
+
+function initMoodWidget(blogKey) {
+  var moods = BLOG_MOODS[blogKey];
+  if (!moods) return;
+
+  var h    = new Date().getHours();
+  var mood = moods.find(function(m) { return m.h.indexOf(h) !== -1; }) || moods[0];
+
+  var emojiEl = document.getElementById('mood-emoji');
+  var labelEl = document.getElementById('mood-label');
+  var textEl  = document.getElementById('mood-text');
+  var timeEl  = document.getElementById('mood-update-time');
+
+  if (emojiEl) { emojiEl.textContent = mood.emoji; emojiEl.style.animation = 'float-bounce 1.5s ease-in-out infinite'; }
+  if (labelEl) labelEl.textContent = mood.label;
+  if (textEl)  textEl.innerHTML    = mood.text;
+  if (timeEl)  {
+    var now = new Date();
+    timeEl.textContent = ('0'+now.getHours()).slice(-2) + ':' + ('0'+now.getMinutes()).slice(-2);
+  }
+
+  var msUntilNextHour = (60 - new Date().getMinutes()) * 60000 - new Date().getSeconds() * 1000;
+  setTimeout(function() { initMoodWidget(blogKey); }, msUntilNextHour);
+}
+
+/* ============================================================
+   DIALUP LOADING SCREEN
+   ============================================================ */
+function navigateWithDialup(url) {
+  var steps = [
+    { pct:  3, msg:'Réveil du modem...',                   sub:'🔌 US Robotics Sportster 56K — bip bip bip' },
+    { pct:  8, msg:'Numérotation Wanadoo...',              sub:'📞 0800 900 900 — tarif local inclus dans l\'abonnement' },
+    { pct: 14, msg:'Tonalité porteuse détectée !!',        sub:'🎵 KSHHHHH KRRRR BIIIIIP KSHHHHH...' },
+    { pct: 19, msg:'Négociation V.90...',                  sub:'ATD0800900900\nCONNECT 28800 bps (on espère 56K)' },
+    { pct: 24, msg:'Votre mère décroche le téléphone...',  sub:'⚠️ Ligne occupée — reconnexion dans 3s...' },
+    { pct: 28, msg:'Reconnexion après dispute familiale',  sub:'📞 Renumérotation... CONNECT 14400 bps (bon bah...)' },
+    { pct: 35, msg:'Authentification WANADOO...',          sub:'🔐 Login : prenom.nom@wanadoo.fr — Mot de passe : ****' },
+    { pct: 42, msg:'IP dynamique attribuée !!',            sub:'🌐 82.65.42.183 — valide jusqu\'à la prochaine connexion' },
+    { pct: 49, msg:'Résolution DNS...',                    sub:'📡 skiablog.com → 82.65.42.183 (NXDOMAIN tenté 2 fois)' },
+    { pct: 55, msg:'Connexion HTTP/1.0...',                sub:'GET / HTTP/1.0\nHost: skiablog.com\nUser-Agent: MSIE 6.0' },
+    { pct: 62, msg:'Réception de la page...',              sub:'⬇️  8.3 Ko reçus / 47.2 Ko — 3 min restantes environ' },
+    { pct: 68, msg:'Téléchargement des images...',         sub:'🖼️  fond_etoiles_clignotantes.gif (1 sur 23)...' },
+    { pct: 74, msg:'Chargement des animations GIF...',     sub:'✨ coeur_battant.gif, etoile_tournante.gif, under_construction.gif...' },
+    { pct: 80, msg:'Rendu Police Comic Sans MS...',        sub:'🔤 Comic Sans MS 14pt BOLD — installation si absente' },
+    { pct: 86, msg:'Vérification des plugins...',          sub:'🔌 Flash 7.0 ✓  RealPlayer ✓  ActiveX ✓  Java 1.4 ✓' },
+    { pct: 91, msg:'Chargement applet Winamp...',          sub:'🎵 Connexion au flux : Crazy Frog — Axel F (3:58)' },
+    { pct: 95, msg:'Optimisation affichage 800×600...',    sub:'🖥️  16 couleurs détectées — passage en 256 couleurs...' },
+    { pct: 98, msg:'Nettoyage du cache IE6...',            sub:'🗑️  Suppression de 47 cookies tiers... (enfin essai)' },
+    { pct:100, msg:'🎉 PAGE CHARGÉE !!',                   sub:'⏱️  Durée totale : 4 min 23 sec — Merci pour votre patience !!' },
+  ];
+
+  var overlay = document.createElement('div');
+  overlay.id = 'dialup-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#000033;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:\'Courier New\',monospace;';
+  overlay.innerHTML =
+    '<div style="text-align:center;color:#00ff88;width:480px;">' +
+      '<div style="font-size:48px;margin-bottom:16px;">🖥️</div>' +
+      '<div style="font-family:Impact,sans-serif;font-size:28px;color:#ffdd44;text-shadow:2px 2px 0 #000;letter-spacing:2px;margin-bottom:8px;">SKIAblog</div>' +
+      '<div style="font-size:11px;color:#aaddff;margin-bottom:20px;font-family:Tahoma,sans-serif;">Wanadoo 56K — ⚠️ Raccrochez le téléphone pendant la navigation !!</div>' +
+      '<div style="background:#000011;border:2px inset #446688;height:20px;position:relative;margin-bottom:8px;">' +
+        '<div id="dialup-bar" style="height:100%;width:0%;background:linear-gradient(to right,#0044aa,#0088ff);transition:width 0.3s ease;"></div>' +
+        '<div id="dialup-pct" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:bold;">0%</div>' +
+      '</div>' +
+      '<div id="dialup-msg" class="dialup-blink" style="font-size:12px;color:#00ff88;margin-bottom:4px;min-height:16px;">Initialisation...</div>' +
+      '<div id="dialup-sub" style="font-size:10px;color:#446688;min-height:14px;white-space:pre;"></div>' +
+      '<div style="margin-top:14px;font-size:10px;color:#334455;">⛔ Ne pas éteindre le modem pendant la connexion</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  playModemSound();
+
+  var stepIdx = 0;
+  var delays  = [60,90,130,100,350,280,120,100,90,80,200,180,160,140,120,180,130,100,500];
+  function runStep() {
+    if (stepIdx >= steps.length) { setTimeout(function(){ window.location = url; }, 200); return; }
+    var s = steps[stepIdx];
+    var bar   = document.getElementById('dialup-bar');
+    var pctEl = document.getElementById('dialup-pct');
+    var msgEl = document.getElementById('dialup-msg');
+    var subEl = document.getElementById('dialup-sub');
+    if (bar)   bar.style.width   = s.pct + '%';
+    if (pctEl) pctEl.textContent = s.pct + '%';
+    if (msgEl) msgEl.textContent = s.msg;
+    if (subEl) subEl.textContent = s.sub;
+    stepIdx++;
+    setTimeout(runStep, delays[stepIdx - 1] || 150);
+  }
+  runStep();
+}
+
+function playModemSound() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var bufferSize = Math.floor(ctx.sampleRate * 0.8);
+    var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    var data   = buffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.03;
+    var noise     = ctx.createBufferSource();
+    noise.buffer  = buffer;
+    var noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0.04;
+    noise.connect(noiseGain); noiseGain.connect(ctx.destination);
+    noise.start(ctx.currentTime);
+
+    [[1200,0,0.08,0.15],[2100,0.12,0.06,0.10],[1800,0.20,0.07,0.12],
+     [900,0.30,0.09,0.15],[1400,0.42,0.06,0.10],[2400,0.50,0.05,0.08]
+    ].forEach(function(n) {
+      var osc = ctx.createOscillator();
+      var g   = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = 'sawtooth'; osc.frequency.value = n[0];
+      var t = ctx.currentTime + n[1];
+      g.gain.setValueAtTime(n[2], t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + n[3]);
+      osc.start(t); osc.stop(t + n[3] + 0.01);
+    });
+  } catch(e) {}
+}
+
+/* ============================================================
+   GUESTBOOK GLOBAL (index.html)
+   ============================================================ */
+function submitGuestbook() {
+  var pseudo = (document.getElementById('guestbook-pseudo') || {}).value || '';
+  var msg    = (document.getElementById('guestbook-msg')    || {}).value || '';
+  var fb     = document.getElementById('guestbook-feedback');
+  if (!pseudo.trim() || !msg.trim()) {
+    if (fb) { fb.textContent = '⚠️ Mets un pseudo et un message !'; fb.style.color = '#ff8844'; }
+    return;
+  }
+  showAICaptcha(function() {
+    if (fb) { fb.textContent = '✅ Message signé !! Merci ' + pseudo + ' !!'; fb.style.color = '#00ff88'; }
+    setTimeout(function() { if (fb) fb.textContent = ''; }, 4000);
+  });
+}
+
+function toggleGuestbookMore() {
+  var more = document.getElementById('guestbook-more');
+  var btn  = document.getElementById('guestbook-more-btn');
+  if (!more || !btn) return;
+  if (more.style.display === 'none') {
+    more.style.display = 'block';
+    btn.textContent = '▲ Réduire';
+  } else {
+    more.style.display = 'none';
+    btn.textContent = '▼ Voir toutes les entrées (3 de plus)';
+  }
+}
+
