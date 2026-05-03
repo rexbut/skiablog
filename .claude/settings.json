@@ -20,7 +20,9 @@
       "Bash(ffmpeg -y -i midjourney_article.png -vf \"scale='min\\(960,iw\\)':-1:flags=lanczos\" -quality 85 midjourney_article.webp)",
       "Bash(ffmpeg -y -i logo-skaiblog.png -vf \"scale='min\\(1200,iw\\)':-1:flags=lanczos\" -quality 90 logo-skaiblog.webp)",
       "Bash(sed -i 's/onclick=\"openLightbox\\(this\\\\.src\\)\"/onclick=\"openLightbox\\(this.dataset.full||this.src\\)\"/g' *.html)",
-      "Bash(sed -i 's|src=\"\\\\\\(\\\\.\\\\.\\\\/assets\\\\/\\\\\\([^\"]*\\\\\\)_avatar\\\\\\)\\\\.webp\"|src=\"\\\\1.webp\" data-full=\"\\\\1.png\"|g' *.html)"
+      "Bash(sed -i 's|src=\"\\\\\\(\\\\.\\\\.\\\\/assets\\\\/\\\\\\([^\"]*\\\\\\)_avatar\\\\\\)\\\\.webp\"|src=\"\\\\1.webp\" data-full=\"\\\\1.png\"|g' *.html)",
+      "Bash(node -e ' *)",
+      "Bash(grep -rn 'fakeIp\\\\|IP détectée\\\\|Adresse IP\\\\|[0-9]\\\\{1,3\\\\}\\\\.[0-9]\\\\{1,3\\\\}\\\\.[0-9]\\\\{1,3\\\\}\\\\.[0-9]\\\\{1,3\\\\}' /mnt/d/remi.butet/EverHome/hackathon/src/)"
     ]
   }
 }
