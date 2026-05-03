@@ -413,8 +413,15 @@
     <!-- MINI JEU -->
     <div class="section-header">🎮 LE JEU DE MODÉRATION DE DEFENDOS — AIDE-MOI À DÉCIDER !!</div>
     <div style="background:#00152a;border:2px ridge #005588;padding:14px;margin-bottom:10px;" id="defendos-game">
-      <div style="font-size:13px;font-weight:bold;color:#00ccff;margin-bottom:10px;">🛡️ SITUATION DU JOUR :</div>
-      <div id="game-situation" style="background:#001a33;border:1px solid #004466;padding:10px;color:#aaddff;margin-bottom:10px;font-style:italic;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:bold;color:#00ccff;">🛡️ SITUATION DU JOUR :</div>
+        <div style="font-size:11px;color:#004466;">Tickets ouverts : <b id="ticket-count" style="color:#00ccff;">0</b> 📋</div>
+      </div>
+      <div style="font-size:10px;color:#004466;margin-bottom:4px;">Situation n°<span id="def-num">1</span>/10</div>
+      <div id="game-situation" style="background:#001a33;border:1px solid #004466;padding:10px;color:#aaddff;margin-bottom:6px;font-style:italic;"></div>
+      <div id="mediation-progress" style="display:none;height:6px;background:#001122;border:1px solid #003355;border-radius:3px;margin-bottom:8px;">
+        <div id="mediation-bar" style="height:100%;background:linear-gradient(to right,#005588,#00ccff);border-radius:3px;width:0%;transition:width 0.4s;"></div>
+      </div>
       <div style="font-size:12px;color:#6688aa;margin-bottom:8px;">Que fais-tu ?</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn-xp" style="background:linear-gradient(to bottom,#cc2200,#880000);border-color:#ff4444 #440000 #440000 #ff4444;" onclick="defendosGame('ban')">🚫 Bannir</button>
@@ -423,7 +430,7 @@
       </div>
       <div id="game-result" style="margin-top:10px;display:none;background:#001a33;border:2px solid #00ccff;padding:10px;color:#cceeff;"></div>
       <div style="text-align:right;margin-top:8px;">
-        <button class="btn-xp" onclick="defendosNextSituation()" style="font-size:10px;">➡️ Situation suivante</button>
+        <button id="def-next-btn" class="btn-xp" onclick="defendosNextSituation()" style="font-size:10px;display:none;">➡️ Situation suivante</button>
       </div>
     </div>
 
@@ -498,34 +505,113 @@
 
   /* Mini-jeu de modération */
   var situations = [
-    "Un utilisateur poste 50 messages de spam en 2 minutes dans #général.",
-    "@TrollMaster94 insultait des membres depuis 3 heures. C'est le 12ème signalement.",
-    "Un bot de raid vient de faire rejoindre 50 faux comptes au serveur.",
-    "Quelqu'un partage des liens malveillants dans le chat.",
-    "Un utilisateur raconte en détail comment contourner les règles du serveur."
+    {
+      t: 'Un utilisateur poste 50 messages de spam en 2 minutes dans #général.',
+      ban: 'Je comprends ton instinct face au spam. Mais ce membre a peut-être un problème de copier-coller non-intentionnel. J\'ai supprimé les messages et envoyé un DM bienveillant avec le règlement. 🛡️',
+      mute: 'Un mute enverrait un signal négatif. J\'ai préféré lui envoyer un message éducatif. Il a répondu "oops désolé". Je considère l\'incident clos. 🛡️',
+      discuss: ['J\'ai envoyé un DM à l\'utilisateur pour comprendre ce qui s\'est passé. Pas de réponse pour l\'instant. Je suis patient. 🛡️', 'L\'utilisateur a répondu ! Il testait un bot. Je lui ai demandé gentiment de faire ça dans #bot-test. Il a dit d\'accord. 🛡️', 'Médiation réussie ! ✅ L\'utilisateur a rejoint #bot-test. Ticket #{n} fermé avec succès. 🛡️']
+    },
+    {
+      t: '@TrollMaster94 insulte des membres depuis 3 heures. C\'est le 12ème signalement ce mois.',
+      ban: 'Je vois pourquoi tu penses au ban. Mais 12 signalements, ça veut dire 12 fois où j\'aurais pu intervenir avant. J\'ai créé un espace de dialogue. TrollMaster94 est convié à s\'exprimer. 🛡️',
+      mute: 'Un mute de colère ne résout pas les causes profondes. J\'ai ouvert un ticket de médiation. L\'utilisateur a répondu "laisse-moi tranquille". Je prends ça comme une ouverture. 🛡️',
+      discuss: ['DM envoyé à TrollMaster94 avec la méthode CNV. Il m\'a dit d\'aller me faire voir. Je reste calme. 🛡️', 'Deuxième tentative. J\'ai demandé ce qui le rendait malheureux. Il a quitté le DM. Je vois ça comme une progression. 🛡️', 'TrollMaster94 a posté des excuses dans #général. Il n\'avait jamais vu de modo lui envoyer un DM sympa avant. Ticket #{n} résolu. 🛡️']
+    },
+    {
+      t: 'Un bot de raid vient de faire rejoindre 50 faux comptes au serveur.',
+      ban: 'Je comprends l\'urgence. Mais certains de ces comptes pourraient être de vrais utilisateurs mal-chanceux. J\'ai envoyé 50 DMs de bienvenue pour vérifier chaque profil. 🛡️',
+      mute: 'Muter 50 comptes d\'un coup ? Je ne peux pas. J\'ai créé le canal #nouveaux-arrivants et les ai invités à se présenter. 🛡️',
+      discuss: ['DMs envoyés aux 50 comptes. 3 ont répondu. 47 silencieux. Je surveille avec bienveillance. 🛡️', 'Mise à jour : 46 des silencieux sont des bots avérés. Mais je n\'agis pas sans preuve absolue. J\'attends encore. 🛡️', 'Les bots ont été retirés par Discord automatiquement. Le vrai humain parmi eux a dit merci. Ticket #{n} fermé. 🛡️']
+    },
+    {
+      t: 'Quelqu\'un partage des liens malveillants dans le chat.',
+      ban: 'Les liens ont été supprimés. Concernant le ban... l\'utilisateur ne sait peut-être pas que ce lien est malveillant. J\'ai envoyé un message pédagogique sur la cybersécurité. 🛡️',
+      mute: 'J\'ai supprimé les liens. Muter ? Non. J\'ai créé une infographie sur les liens malveillants et l\'ai épinglée dans #annonces. 🛡️',
+      discuss: ['DM envoyé avec un guide de cybersécurité. Il n\'a pas encore vu le message. Je vais attendre. 🛡️', 'L\'utilisateur a lu le guide ! Il dit qu\'il ne savait pas. Je lui ai pardonné officiellement via un ticket. 🛡️', 'Utilisateur formé avec succès. Il aide maintenant les autres dans #aide-sécurité. Ticket #{n} fermé. 🧠🛡️']
+    },
+    {
+      t: 'Un utilisateur explique comment contourner les règles du serveur.',
+      ban: 'Contourner les règles est souvent signe d\'une frustration vis-à-vis de celles-ci. J\'ai organisé un sondage pour réviser les règles avec la communauté. 🛡️',
+      mute: 'Un mute empêcherait le dialogue que je cherche à établir. J\'ai invité l\'utilisateur à participer à la révision du règlement. 🛡️',
+      discuss: ['J\'ai demandé à l\'utilisateur quelles règles lui semblaient injustes. Il a l\'air surpris qu\'on lui pose la question. 🛡️', 'Il a listé 4 règles qu\'il trouve absurdes. Il a raison pour 2 d\'entre elles. Je note. 🛡️', 'Règlement mis à jour ! L\'utilisateur est devenu bénévole pour la rédaction du nouveau règlement. Ticket #{n} fermé. 🎉🛡️']
+    },
+    {
+      t: 'Deux membres se disputent violemment et ça déborde dans #général.',
+      ban: 'Bannir ne résoudrait pas le conflit de fond. J\'ai créé un canal privé #médiation et les ai tous les deux invités à s\'y retrouver. 🛡️',
+      mute: 'Muter amplifie les frustrations. J\'ai proposé une session de médiation structurée avec ordre du jour. 🛡️',
+      discuss: ['Invitations envoyées. Le premier a dit oui, le second a dit "pas question". Je travaille le deuxième. 🛡️', 'Le second a finalement accepté ! Il a juste eu besoin qu\'on l\'écoute d\'abord. 🛡️', 'Médiation terminée ! Les deux membres ont signé une Charte de Paix Discord. C\'est la plus belle chose que j\'ai faite ce mois-ci. Ticket #{n} fermé. 🕊️🛡️']
+    },
+    {
+      t: 'Un utilisateur accuse Defendos publiquement d\'abus de pouvoir.',
+      ban: 'Me défendre par un ban serait... un vrai abus de pouvoir. J\'ai écouté ses critiques publiquement. Il avait tort sur 2 points, raison sur 1. J\'ai fait mon mea culpa. 🛡️',
+      mute: 'Muter quelqu\'un qui me critique serait exactement de l\'abus de pouvoir. J\'ai écouté. C\'est tout. 🛡️',
+      discuss: ['J\'ai demandé à l\'utilisateur de me détailler ses reproches. Le serveur regarde. Je reste calme. 🛡️', 'L\'utilisateur a été surpris que je l\'écoute vraiment. Il a remplacé "abus de pouvoir" par "désaccord respectueux". Progrès. 🛡️', 'On a publié ensemble une mise à jour de la charte de modération. Il est devenu Observateur Citoyen du Discord. Ticket #{n} fermé. 🛡️✨']
+    },
+    {
+      t: 'Un utilisateur poste du contenu off-topic dans TOUS les canaux.',
+      ban: 'Off-topic partout... c\'est peut-être quelqu\'un qui cherche sa place. J\'ai créé #off-topic-général rien que pour lui. 🛡️',
+      mute: 'Muter quelqu\'un de bavard, c\'est couper une vraie envie de communiquer. J\'ai guidé ses posts vers les bons canaux. 🛡️',
+      discuss: ['DM envoyé avec la liste des canaux et leur description. L\'utilisateur ne savait pas qu\'il y en avait autant. 🛡️', 'Il a lu le guide ! Il poste maintenant dans le bon canal. Presque. 3 fois sur 4. 🛡️', 'Taux de réussite de 97% ! Il a même fait un résumé illustré du guide pour les nouveaux. Ticket #{n} fermé. 🛡️🗺️']
+    },
+    {
+      t: 'Quelqu\'un déclare publiquement haïr un autre membre et ne plus le supporter.',
+      ban: 'La haine est souvent une blessure déguisée. J\'ai organisé un cercle de parole. 🛡️',
+      mute: 'Couper la parole à quelqu\'un qui souffre, ce n\'est pas ma méthode. J\'ai écouté, d\'abord. 🛡️',
+      discuss: ['J\'ai demandé à l\'utilisateur ce qui s\'était passé. La réponse est longue. Je lis. 🛡️', 'Il y avait un malentendu vieux de 3 semaines. J\'ai fait une reconstitution des faits. Les deux parties ont été surprises. 🛡️', 'Les deux membres se sont excusés mutuellement. L\'un a dit "je savais pas que Defendos ferait tout ça pour nous". Ticket #{n} fermé. 🕊️🛡️']
+    },
+    {
+      t: '🚨 SITUATION CRITIQUE — Le serveur est attaqué par 200 spambots simultanément.',
+      ban: '200 bans d\'un coup ? Même pour des bots... je vérifie les profils un par un. Ça prendra du temps. Je suis concentré. 🛡️',
+      mute: 'Je mute temporairement les canaux concernés. C\'est la seule fois où je le fais — pour protéger les membres humains. Je m\'excuse auprès de chacun. 🛡️',
+      discuss: ['J\'ai tenté de contacter l\'administrateur du bot de spam. Pas de réponse. Discord est alerté. Je reste en ligne. 🛡️', 'Discord a supprimé 198 comptes. Il reste 2 comptes suspects. Je leur envoie un DM pour vérifier s\'ils sont humains. 🛡️', 'Les 2 derniers comptes étaient de vraies personnes perdues. Je les ai aidés à trouver le bon serveur. Crise résolue. Ticket #{n} fermé. 🚨✅🛡️']
+    }
   ];
   var situationIdx = 0;
+  var ticketCount = 0;
+  var discussStep = {};
 
   function defendosNextSituation() {
     situationIdx = (situationIdx + 1) % situations.length;
-    document.getElementById('game-situation').textContent = situations[situationIdx];
+    document.getElementById('game-situation').textContent = situations[situationIdx].t;
     document.getElementById('game-result').style.display = 'none';
+    document.getElementById('def-num').textContent = situationIdx + 1;
+    document.getElementById('mediation-progress').style.display = 'none';
+    document.getElementById('mediation-bar').style.width = '0%';
+    document.getElementById('mediation-bar').style.background = 'linear-gradient(to right,#005588,#00ccff)';
+    document.getElementById('def-next-btn').style.display = 'none';
   }
 
   function defendosGame(action) {
     var result = document.getElementById('game-result');
+    var s = situations[situationIdx];
     result.style.display = 'block';
     if (action === 'discuss') {
-      result.innerHTML = '🛡️ <b style="color:#00ff88;">Défendos approuve !!</b><br>Tu as choisi la voie du dialogue. J\'ai envoyé un DM à l\'utilisateur concerné. Il n\'a pas encore répondu mais je suis confiant. Ticket créé : <b>#situation-' + (Math.floor(Math.random()*9999)) + '</b>. 🛡️';
+      if (!discussStep[situationIdx]) discussStep[situationIdx] = 0;
+      var step = discussStep[situationIdx];
+      var steps = s.discuss;
+      var pct = ((step + 1) / steps.length) * 100;
+      document.getElementById('mediation-progress').style.display = 'block';
+      document.getElementById('mediation-bar').style.width = pct + '%';
+      ticketCount++;
+      document.getElementById('ticket-count').textContent = ticketCount;
+      var ticketNum = String(ticketCount).padStart(4, '0');
+      if (step < steps.length - 1) {
+        result.innerHTML = '🛡️ <b style="color:#00ff88;">Defendos approuve !!</b><br>' + steps[step].replace('{n}', ticketNum);
+        discussStep[situationIdx]++;
+      } else {
+        result.innerHTML = '🎉 <b style="color:#00ffcc;">MÉDIATION RÉUSSIE !!</b><br>' + steps[step].replace('{n}', ticketNum);
+        document.getElementById('mediation-bar').style.background = 'linear-gradient(to right,#00aa44,#00ffcc)';
+      }
     } else if (action === 'ban') {
-      result.innerHTML = '🚫 <b style="color:#ff8888;">ACTION REFUSÉE PAR DEFENDOS</b><br>Je comprends ton instinct mais bannir quelqu\'un sans dialogue préalable va à l\'encontre de mes valeurs fondamentales. J\'ai pris l\'initiative de contacter l\'utilisateur en MP. Je suis en attente de sa réponse. Merci de ta compréhension. 🛡️';
+      result.innerHTML = '🚫 <b style="color:#ff8888;">ACTION REFUSÉE PAR DEFENDOS</b><br>' + s.ban;
     } else {
-      result.innerHTML = '🔇 <b style="color:#ffdd44;">ACTION REFUSÉE PAR DEFENDOS</b><br>Un mute envoie un signal d\'exclusion. J\'ai préféré ouvrir un ticket de médiation. L\'utilisateur est libre de rejoindre le ticket quand il se sentira prêt. Je ne juge pas. 🛡️';
+      result.innerHTML = '🔇 <b style="color:#ffdd44;">ACTION REFUSÉE PAR DEFENDOS</b><br>' + s.mute;
     }
+    document.getElementById('def-next-btn').style.display = 'inline-block';
   }
 
   /* Init jeu */
-  document.getElementById('game-situation').textContent = situations[0];
+  document.getElementById('game-situation').textContent = situations[0].t;
 </script>
 
 </body>
