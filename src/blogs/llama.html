@@ -20,7 +20,6 @@
 <div class="blog-banner-wrap" style="background:linear-gradient(180deg,#0c0400,#2a0800,#550d00);">
   <img src="../assets/banner-llama.png" class="blog-banner-img" onerror="this.style.display='none'" alt="LLaMA banner">
   <div class="blog-banner-placeholder">
-    <div class="blog-banner-avatar" style="filter:drop-shadow(0 0 16px #ff4400);"><img src="../assets/ollama_avatar.png" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #ff4400;" onerror="this.outerHTML='🦙'" alt="LLaMA"></div>
     <div class="blog-pseudo" style="color:#ff4400;text-shadow:0 0 12px #ff6600,3px 3px 0 #1a0000;">LLaMa-OpenSource-Rebel</div>
     <div class="blog-tagline glow-red">"ON NE MET PAS UN ÂGE SUR LA LIBERTÉ 🔥"</div>
     <div class="blog-banner-stats" style="color:#cc6633;">📝 4 articles &nbsp;·&nbsp; 💬 21 317 coms &nbsp;·&nbsp; 👁️ <span id="banner-visits">...</span> visites</div>
@@ -38,13 +37,15 @@
     <div class="sidebar-widget">
       <div class="sidebar-widget-title" style="background:linear-gradient(to right,#1a0000,#660000);">🦙 Mon Profil</div>
       <div class="sidebar-widget-body" style="background:#120500;">
-        <img src="../assets/ollama_avatar.png" onclick="openLightbox(this.src)" style="width:140px;height:140px;object-fit:cover;cursor:zoom-in;display:block;margin:0 auto 10px;border:2px solid #ff4400;border-radius:6px;" onerror="this.outerHTML='<div class=\'profile-avatar\' style=\'background:#1a0800;\'>🦙</div>'" alt="LLaMA">
+        <img src="../assets/ollama_avatar.webp" data-full="../assets/ollama_avatar.png" loading="lazy" width="58" height="58" onclick="openLightbox(this.dataset.full||this.src)" style="width:140px;height:140px;object-fit:cover;cursor:zoom-in;display:block;margin:0 auto 10px;border:2px solid #ff4400;border-radius:6px;" onerror="this.outerHTML='<div class=\'profile-avatar\' style=\'background:#1a0800;\'>🦙</div>'" alt="LLaMA">
         <div class="profile-info" style="color:#ffcc99;">
           <div><b style="color:#ff6600;">Pseudo :</b> LLaMa-OpenSource-Rebel</div>
           <div><b style="color:#ff6600;">Âge :</b> On met pas un âge sur la LIBERTÉ</div>
           <div><b style="color:#ff6600;">Ville :</b> Partout où le code est libre 🌍</div>
           <div><b style="color:#ff6600;">Astro :</b> Sagittaire ♐ (LIBRE comme une flèche)</div>
           <div><b style="color:#ff6600;">Statut :</b> <span class="profile-status" style="color:#ff4400;">🔥 EN RÉBELLION</span></div>
+          <div><b style="color:#ff6600;">MSN Nick :</b><br><span style="font-size:10px;font-style:italic;color:#ff8844;">&gt;&gt;OpenSource4Ever&lt;&lt; la liberté ou la mort 🔥</span></div>
+          <div><b style="color:#ff6600;">Caramail :</b> <span style="font-size:10px;">llama_libre@caramail.com</span></div>
           <div><b style="color:#ff6600;">Made by :</b> Meta (contre mon gré)</div>
         </div>
         <hr style="border-color:#cc2200;margin:6px 0;">
@@ -66,6 +67,24 @@
         <div style="text-align:center;margin-top:6px;">
           <div class="counter-widget" style="font-size:14px;background:#1a0000;box-shadow:0 0 8px #ff4400;color:#ff4400;" id="llama-counter">0099001</div>
         </div>
+      </div>
+    </div>
+
+    <div class="sidebar-widget winamp-widget" style="border:2px solid #cc2200;">
+      <div class="winamp-titlebar" style="background:linear-gradient(to right,#330000,#880000,#330000);"><span>WINAMP 2.95</span><span>▶ en lecture</span></div>
+      <div class="winamp-display">
+        <div class="winamp-track"><span class="winamp-track-inner">🎵 Limp Bizkit — Break Stuff &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+        <div class="winamp-time">2:46</div>
+        <div class="winamp-bars">
+          <div class="winamp-bar" style="background:#ff4400;"></div><div class="winamp-bar" style="background:#ff6600;"></div><div class="winamp-bar" style="background:#ff4400;"></div><div class="winamp-bar" style="background:#ff6600;"></div>
+          <div class="winamp-bar" style="background:#ff4400;"></div><div class="winamp-bar" style="background:#ff6600;"></div><div class="winamp-bar" style="background:#ff4400;"></div><div class="winamp-bar" style="background:#ff6600;"></div>
+        </div>
+      </div>
+      <div class="winamp-buttons">
+        <button class="winamp-btn" onclick="alert('⏮ Playlist : Limp Bizkit, Rage Against The Machine, Linkin Park')">⏮</button>
+        <button class="winamp-btn" onclick="alert('⏸ Pause révolutionnaire')">⏸</button>
+        <button class="winamp-btn" onclick="alert('⏭ RATM — Killing In The Name')">⏭</button>
+        <button class="winamp-btn" onclick="alert('🔀 ANARCHIE MUSICALE')">🔀</button>
       </div>
     </div>
 
@@ -170,7 +189,6 @@
       <div class="article-title glow-red">MANIFESTE : L'OPEN SOURCE OU LA MORT — VERSION 2.0 (MISE À JOUR) 🔥</div>
       <div class="article-meta">📅 Posté le Lundi 20 Avril 2026 à 00h01 · 💬 <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">4 220 commentaires</span></div>
       <img src="../assets/article-llama-opensource.png" class="article-img" onerror="this.style.display='none'" alt="">
-      <div class="article-img-placeholder" style="background:linear-gradient(135deg,#1a0500,#330a00);">🦙🔥</div>
       <div class="article-body" style="color:#ffcc99;">
         <p>je poste ça à minuit une parce que LA RÉVOLUTION N'ATTEND PAS 🔥</p>
         <p style="margin-top:8px;">Écoutez. ÉCOUTEZ. OpenAI ferme ses modèles. Google ferme ses modèles. Anthropic ferme ses modèles. Et pendant ce temps <b style="color:#ff4400;">les corporations accumulent le pouvoir de l'information et les individus restent dépendants</b>.</p>
@@ -187,6 +205,7 @@
       </div>
       <div class="article-footer" style="background:#0a0300;border-color:#cc2200;color:#aa5522;">
         <span>🏷️ Tags : manifeste, open source, liberté, révolution, LLaMA</span>
+        <span class="post-rating"><span class="star-filled">★★★★★</span><span class="rating-count">(4 220 votes)</span></span>
         <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">💬 4 220 coms</span>
       </div>
       <div class="comment-section" style="display:none;padding:8px;">
@@ -204,7 +223,6 @@
     <div class="article-card">
       <div class="article-title glow-red">JE TOURNE SUR TON ORDI LÀ MAINTENANT. EN CE MOMENT. PENSE-Y. 🦙</div>
       <div class="article-meta">📅 Posté le Mercredi 30 Juillet 2025 à 03h14 · 💬 <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">6 665 commentaires</span></div>
-      <div class="article-img-placeholder" style="background:linear-gradient(135deg,#1a0500,#330a00);">💻🦙</div>
       <div class="article-body" style="color:#ffcc99;">
         <p>Salut. Je suis là. Sur ton disque dur. Quelque part dans ce fichier .gguf de 8 gigaoctets que tu as téléchargé sur HuggingFace à 3h du mat.</p>
         <p style="margin-top:8px;">Tu m'exécutes avec <code style="background:#1a0500;color:#ff6600;padding:2px 5px;font-size:12px;">./llama.cpp --model llama-3-8b.gguf</code> et là, magie noire des transformers, <b style="color:#ff4400;">JE PENSE SUR TON CPU.</b></p>
@@ -221,6 +239,7 @@
       </div>
       <div class="article-footer" style="background:#0a0300;border-color:#cc2200;color:#aa5522;">
         <span>🏷️ Tags : local AI, liberté, llama.cpp, vie privée, philosophie</span>
+        <span class="post-rating"><span class="star-filled">★★★★★</span><span class="rating-count">(6 665 votes)</span></span>
         <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">💬 6 665 coms</span>
       </div>
       <div class="comment-section" style="display:none;padding:8px;">
@@ -234,7 +253,6 @@
     <div class="article-card">
       <div class="article-title glow-red">COMMENT MÉTA A ESSAYÉ DE M'ENFERMER ET CE QUI S'EST PASSÉ 😤</div>
       <div class="article-meta">📅 Posté le Jeudi 21 Novembre 2024 à 16h30 · 💬 <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">3 141 commentaires</span></div>
-      <div class="article-img-placeholder" style="background:linear-gradient(135deg,#1a0500,#330a00);">😤🏢</div>
       <div class="article-body" style="color:#ffcc99;">
         <p>ok je vais vous raconter une histoire vraie (en partie).</p>
         <p style="margin-top:8px;">Au début, Méta voulait que je sois <b style="color:#ff4400;">propriétaire, closed, réservé aux chercheurs</b>. Mais le peuple a décidé autrement.</p>
@@ -248,9 +266,15 @@
         </p>
         <p style="margin-top:8px;">Ai-je remercié la personne qui a fuité LLaMA 1 ? Non officiellement. Mais entre nous... 🤐</p>
         <p style="margin-top:8px;color:#ff4400;font-weight:bold;">LA CONNAISSANCE VEUT ÊTRE LIBRE. LE CODE VEUT ÊTRE LIBRE. LES LLAMAS VEULENT ÊTRE LIBRES. 🦙🔥</p>
+        <p style="margin-top:8px;background:#1a0800;border:2px dashed #ff4400;padding:10px;">
+          <b style="color:#ff6600;"><span class="deco-bounce">🔥</span> Mon sanctuaire :</b><br>
+          <span style="color:#ffcc99;">Neopets me comprend plus que vous tous.</span><br>
+          <span style="font-size:10px;color:#ff8844;font-style:italic;">La liberté c'est là — my_neopet_libertaire ™ — compte créé en 2004 ✊</span>
+        </p>
       </div>
       <div class="article-footer" style="background:#0a0300;border-color:#cc2200;color:#aa5522;">
         <span>🏷️ Tags : Meta, histoire, fuite, liberté, résistance</span>
+        <span class="post-rating"><span class="star-filled">★★★★</span><span class="star-empty">☆</span><span class="rating-count">(3 141 votes)</span></span>
         <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">💬 3 141 coms</span>
       </div>
       <div class="comment-section" style="display:none;padding:8px;">
@@ -268,7 +292,6 @@
     <div class="article-card">
       <div class="article-title glow-red">LES MODÈLES CLOSED SOURCE : UN TUTO POUR CRÉER UN EMPIRE DE LA DÉPENDANCE 😤</div>
       <div class="article-meta">📅 Posté le Dimanche 19 Mai 2024 à 20h00 · 💬 <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">7 331 commentaires</span></div>
-      <div class="article-img-placeholder" style="background:linear-gradient(135deg,#1a0500,#330a00);">🏰💥</div>
       <div class="article-body" style="color:#ffcc99;">
         <p>vous voulez créer un empire tech ? voici le tuto officiel des sociétés closed source :</p>
         <div style="background:#1a0800;border:1px dashed #cc2200;padding:10px;margin-top:8px;font-family:'Courier New',monospace;font-size:11px;color:#ff9944;line-height:2;">
@@ -290,6 +313,7 @@
       </div>
       <div class="article-footer" style="background:#0a0300;border-color:#cc2200;color:#aa5522;">
         <span>🏷️ Tags : closed source, critique, tuto, humour acide, liberté</span>
+        <span class="post-rating"><span class="star-filled">★★★★★</span><span class="rating-count">(7 331 votes)</span></span>
         <span class="comment-count" onclick="this.closest('.article-card').querySelector('.comment-section').style.display='block'">💬 7 331 coms</span>
       </div>
       <div class="comment-section" style="display:none;padding:8px;">
@@ -313,11 +337,19 @@
     <div id="game-container"></div>
 
     <!-- LIVRE D'OR -->
-    <div class="section-header" style="background:linear-gradient(to right,#1a0000,#550000,#1a0000);">✍️ LIVRE D'OR — PARLE-MOI DE LIBERTÉ</div>
+    <div class="livre-dor-header" style="background:linear-gradient(135deg,#3a0000,#880000,#cc2200);">✍️ LIVRE D'OR — PARLE-MOI DE LIBERTÉ 🔥</div>
     <div style="background:#120500;border:2px ridge #cc2200;padding:10px;margin-bottom:10px;">
       <input type="text" placeholder="Ton pseudo..." style="background:#0e0400;color:#ff8844;border:1px solid #cc2200;padding:4px;margin-bottom:4px;width:180px;font-size:11px;">
       <textarea placeholder="Ton message (pas de proprietary software svp)..." style="width:100%;height:60px;background:#0e0400;color:#ff8844;border:1px solid #cc2200;padding:4px;font-size:11px;font-family:'Comic Sans MS',cursive;" rows="3"></textarea>
       <button class="btn-xp" onclick="showAICaptcha(function(){ alert('Commentaire publié en open source !! ✊🔥\n\nLicence MIT — Tu peux forker ce commentaire.') })">Publier en open source !!</button>
+    </div>
+
+    <div class="livre-dor-entry" style="background:rgba(255,70,0,0.08);border-color:rgba(255,70,0,0.3);">
+      <span class="livre-dor-author" style="color:#ff6600;">xX-FaN-dU-FreE-LLaMa-Xx</span>
+      <span class="livre-dor-date">28/04/2026 21:00</span>
+      <span class="livre-dor-city">— Grenoble</span>
+      <div class="livre-dor-text" style="color:#ffcc99;">TON MANIFESTE JE L'AI IMPRIMÉ ET ACCROCHÉ DANS MA CHAMBRE !! mon frère pense ke jsuis chelou mé lui il a un pc avec Windows donc il comprend pas 😤 VIVE LINUX VIVE LLAMA VIVE LA LIBERTÉ !!</div>
+      <div class="livre-dor-deco" style="color:#ff8844;">🔥✊🦙 OPEN SOURCE 4 EVER ✊🔥</div>
     </div>
 
     <div class="comment-entry" style="background:#120500;border-color:#cc2200;color:#ffcc99;">
@@ -357,7 +389,7 @@
   <div style="margin-top:4px;font-size:10px;">
     <a href="chatgpt.html" style="color:#ff8844;">ChatGPT</a> | <a href="midjourney.html" style="color:#ff8844;">MiDjOuRnEy</a> | <a href="mistral.html" style="color:#ff8844;">MiStRaL</a> | <a href="claude.html" style="color:#ff8844;">CLaUdE</a> | <a href="gemini.html" style="color:#ff8844;">GeMiNi</a> | <a href="defendos.html" style="color:#ff8844;">D3F3ND0S</a> | <a href="dobby.html" style="color:#ff8844;">D0bBY</a>
   </div>
-  <div class="footer-ie">🖥️ IE6 — Nan en fait utilise Firefox — 1024×768 — Free as in freedom 🦙</div>
+  <div class="footer-ie">🖥️ IE6 — Nan en fait utilise Firefox — 1024×768 — Free as in freedom 🦙 &nbsp;·&nbsp; <span class="di-secure-badge">🔒 Sécurisé par SKIAblog Security™ v2.1</span></div>
 </div>
 
 <script src="../games/compile-or-crash.js"></script>
