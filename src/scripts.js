@@ -941,10 +941,16 @@ function navigateWithDialup(url) {
       '</div>' +
       '<div id="dialup-msg" class="dialup-blink" style="font-size:12px;color:#00ff88;margin-bottom:4px;min-height:16px;">Initialisation...</div>' +
       '<div id="dialup-sub" style="font-size:10px;color:#446688;min-height:14px;white-space:pre;"></div>' +
-      '<div style="margin-top:14px;font-size:10px;color:#334455;">⛔ Ne pas éteindre le modem pendant la connexion</div>' +
+      '<div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:12px;">' +
+        '<span style="font-size:10px;color:#334455;">⛔ Ne pas éteindre le modem</span>' +
+        '<button id="dialup-mute-btn" onclick="toggleDialupSound()" style="background:linear-gradient(to bottom,#223344,#112233);border:1px solid #446688;color:#aaddff;font-size:10px;cursor:pointer;padding:2px 8px;font-family:Tahoma,sans-serif;">🔊 Son</button>' +
+      '</div>' +
     '</div>';
   document.body.appendChild(overlay);
 
+  window._dialupMuted = document.cookie.indexOf('dialup_muted=1') !== -1;
+  var muteBtn = document.getElementById('dialup-mute-btn');
+  if (muteBtn && window._dialupMuted) muteBtn.textContent = '🔇 Muet';
   playModemSound();
 
   var stepIdx = 0;
@@ -966,7 +972,16 @@ function navigateWithDialup(url) {
   runStep();
 }
 
+function toggleDialupSound() {
+  window._dialupMuted = !window._dialupMuted;
+  var btn = document.getElementById('dialup-mute-btn');
+  if (btn) btn.textContent = window._dialupMuted ? '🔇 Muet' : '🔊 Son';
+  var expires = new Date(Date.now() + 365 * 864e5).toUTCString();
+  document.cookie = 'dialup_muted=' + (window._dialupMuted ? '1' : '0') + ';expires=' + expires + ';path=/';
+}
+
 function playModemSound() {
+  if (window._dialupMuted) return;
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
     var bufferSize = Math.floor(ctx.sampleRate * 0.8);
