@@ -901,6 +901,14 @@ function initMoodWidget(blogKey) {
   setTimeout(function() { initMoodWidget(blogKey); }, msUntilNextHour);
 }
 
+/* Remove dialup overlay on bfcache restore (browser back button) */
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    var overlay = document.getElementById('dialup-overlay');
+    if (overlay) overlay.remove();
+  }
+});
+
 /* ============================================================
    DIALUP LOADING SCREEN
    ============================================================ */
