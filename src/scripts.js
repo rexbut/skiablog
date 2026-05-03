@@ -195,13 +195,12 @@ function startTimedCounters() {
       if (el) el.textContent = getTimedCount(k).toLocaleString('fr-FR');
     });
 
-    // Compteur global (format 0000000)
+    // Compteur global
     var total = getTimedCount('total');
-    var padded = String(total).padStart(7, '0');
     var gc = document.getElementById('global-counter');
     var fc = document.getElementById('footer-counter');
-    if (gc) gc.textContent = padded;
-    if (fc) fc.textContent = padded;
+    if (gc) gc.textContent = total.toLocaleString('fr-FR');
+    if (fc) fc.textContent = total.toLocaleString('fr-FR');
 
     // Stats globales
     var blogsEl   = document.getElementById('stat-blogs');
